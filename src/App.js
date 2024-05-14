@@ -1,16 +1,17 @@
-import logo from "./logo.svg";
 import "./App.css";
-import { Home } from "./pages/Home/Home";
+import { Home } from "./pages/home/Home.js";
 import {
   createBrowserRouter,
   RouterProvider,
   Outlet
 } from "react-router-dom";
-import Clients from "./pages/Clients/Clients.js";
-import Projects from "./pages/Projects/Projects.js";
+import Clients from "./pages/clients/Clients.js";
+import Projects from "./pages/projects/Projects.js";
 import Navbar from "./components/navbar/Navbar.js";
 import Footer from "./components/footer/Footer.js";
 import Menu from "./components/menu/Menu.js";
+import { Login } from "./pages/login/Login.js";
+import "./styles/global.scss";
 
 
 function App() {
@@ -42,7 +43,7 @@ function App() {
           element: <Home />,
         },
         {
-          path: "/projects",
+          path: "/proyectos",
           element: <Projects />,
         },
         {
@@ -51,6 +52,10 @@ function App() {
         },
       ]
     },
+    {
+      path: "/login",
+      element: <Login />
+    }
   ]);
 
   return <RouterProvider router={router}/>;

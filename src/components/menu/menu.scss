@@ -1,2 +1,39 @@
-.menu
-{}
+@import '../../styles/variables.scss';
+
+.menu {
+    height: 100%;
+  .item {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 10px;
+    margin-bottom: 10px;
+   
+
+.title{
+    font-size: 12px;
+    font-weight: 200;
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: bold;
+    color: $soft-color;
+}
+
+    .listItem{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 5px;
+        border-radius: 5px;
+
+        &:hover{
+            background-color: $soft-bg;
+        }
+
+        img {
+            width: 28px;
+            height: 28px;
+          }
+    }
+    
+  }
+}
