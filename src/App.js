@@ -47,9 +47,10 @@ function App() {
           element: <Projects />,
         },
         {
-          path: "/clients",
+          path: "/clientes",
           element: <Clients />,
         },
+        
       ]
     },
     {
