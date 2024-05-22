@@ -12,9 +12,12 @@ import Footer from "./components/footer/Footer.js";
 import Menu from "./components/menu/Menu.js";
 import { Login } from "./pages/login/Login.js";
 import "./styles/global.scss";
+import EditClient from "./pages/editClient/EditClient.js";
+import ViewClient from "./pages/viewClient/viewClient.js";
 
 
 function App() {
+
 
   const Layout = () =>{
     return (
@@ -50,7 +53,14 @@ function App() {
           path: "/clientes",
           element: <Clients />,
         },
-        
+        {
+          path: "/clientes/editar/:id",
+          element: <EditClient />,
+        },
+        {
+          path: "/clientes/:id",
+          element: <ViewClient />,
+        },
       ]
     },
     {

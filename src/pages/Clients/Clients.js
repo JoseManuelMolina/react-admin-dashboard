@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./clients.scss";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -10,24 +11,30 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Button from "@mui/material/Button";
 
 const columns = [
   { id: "id", label: "ID", minWidth: 50 },
   { id: "cif", label: "CIF", minWidth: 80 },
   { id: "razonSocial", label: "Razón Social", minWidth: 80 },
   { id: "email", label: "Email", minWidth: 80 },
-  { id: "personaContacto", label: "PersonaContacto", minWidth: 50 },
+  { id: "personaContacto", label: "Persona de Contacto", minWidth: 50 },
   { id: "direccion", label: "Dirección", minWidth: 170 },
   { id: "editar", label: "Editar", minWidth: 50, align: "center" },
   { id: "eliminar", label: "Eliminar", minWidth: "50", align: "center" },
 ];
 
 const Clients = () => {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [clientes, setClientes] = useState([]);
+  const [deleteErrorDialogOpen, setDeleteErrorDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchClientes().then((data) => {
@@ -46,6 +53,34 @@ const Clients = () => {
     }
   };
 
+  const handleEditClick = (id) => {
+    // Redirigir a la página de edición del cliente con el ID correspondiente
+    window.location.href = `/clientes/editar/${id}`;
+  };
+
+  const handleDeleteClick = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8080/clientes/borrar/${id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        // Eliminación exitosa
+      // Actualizar la lista de clientes eliminando el cliente con el ID proporcionado
+        setClientes(clientes.filter(cliente => cliente.id !== id));
+        console.log("OK")
+      } else if (response.status === 404) {
+        // Mostrar el diálogo de error si el cliente no se encuentra
+        console.log("404")
+        setDeleteErrorDialogOpen(true);
+      } else {
+        // Otro tipo de error
+        console.error("Error al intentar borrar el cliente:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error al intentar borrar el cliente:", error);
+    }
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -55,16 +90,9 @@ const Clients = () => {
     setPage(0);
   };
 
-  const handleEditClick = (id) => {
-    // Lógica para manejar la edición del proyecto con el ID proporcionado
-    console.log('Edit',id)
+  const handleCloseDeleteErrorDialog = () => {
+    setDeleteErrorDialogOpen(false);
   };
-
-  const handleDeleteClick = (id) => {
-    // Lógica para manejar la eliminación del proyecto con el ID proporcionado
-    console.log('Delete',id)
-  };
-
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
@@ -87,23 +115,28 @@ const Clients = () => {
             {clientes
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => (
-                <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                <TableRow
+                  hover
+                  role="checkbox"
+                  tabIndex={-1}
+                  key={row.id}
+                >
                   {columns.map((column) => {
                     const value = row[column.id];
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.id === "editar" ? (
+                        {column.id === "razonSocial" ? (
+                          <Link to={`/clientes/${row.id}`}>
+                            {value}
+                          </Link>
+                        ) : column.id === "editar" ? (
                           <IconButton onClick={() => handleEditClick(row.id)}>
                             <EditIcon />
                           </IconButton>
                         ) : column.id === "eliminar" ? (
-                          <IconButton
-                            onClick={() => handleDeleteClick(row.id)}
-                          >
+                          <IconButton onClick={() => handleDeleteClick(row.id)}>
                             <DeleteIcon />
                           </IconButton>
-                        ) : column.format && typeof value === "number" ? (
-                          column.format(value)
                         ) : (
                           value
                         )}
@@ -125,6 +158,18 @@ const Clients = () => {
         onRowsPerPageChange={handleChangeRowsPerPage}
         labelRowsPerPage="Filas por página:"
       />
+      {/* Diálogo de error al intentar borrar */}
+      <Dialog open={deleteErrorDialogOpen} onClose={handleCloseDeleteErrorDialog}>
+        <DialogTitle>Error al borrar cliente</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            El cliente no se pudo borrar porque tiene proyectos asignados.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteErrorDialog}>Cerrar</Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 };
